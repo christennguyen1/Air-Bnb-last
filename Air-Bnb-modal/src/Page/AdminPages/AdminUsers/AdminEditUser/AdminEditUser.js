@@ -5,11 +5,10 @@ import { updateUserInforAction } from "../../../../redux/Actions/userAction";
 import { useDispatch, useSelector } from "react-redux";
 import { useFormik } from "formik";
 import moment from "moment";
-import { history } from "../../../../App";
 
 export default function AdminEditUser() {
   const dispatch = useDispatch();
-  const { userInforDetails,userInfor } = useSelector((state) => state.userReducer);
+  const { userInforDetails } = useSelector((state) => state.userReducer);
 
   //Form
   const { Option } = Select;
@@ -35,18 +34,10 @@ export default function AdminEditUser() {
       gender: userInforDetails.gender,
       password: userInforDetails.password,
       birthday: userInforDetails.birthday,
-      type: userInforDetails.type,
+      type: "ADMIN",
     },
     onSubmit: (values) => {
       dispatch(updateUserInforAction(values, values.id));
-      setTimeout(() => {
-        if(userInfor.type==="ADMIN"){
-        history.push("/admin/user");
-        }
-        else {
-          history.push(`/profile/${values.id}`);
-        }
-      }, 1000);
     },
     validationSchema: Yup.object({
       name: Yup.string()

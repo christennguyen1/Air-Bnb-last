@@ -8,12 +8,9 @@ import UserNav from "../../components/NavHeader/UserNav";
 import FooterNav from "../Footer/Footer";
 import "./register.css";
 import { useFormik } from "formik";
-import { useDispatch } from "react-redux";
-import { getDangKi } from "../../redux/Actions/userActions";
 
 export default function Register() {
   let history = useHistory();
-  let dispatch = useDispatch();
 
   const formik = useFormik({
     initialValues: {
@@ -26,7 +23,18 @@ export default function Register() {
       address: "",
     },
     onSubmit: (values) => {
-      dispatch(getDangKi(values));
+      httpServ
+        .dangKi(values)
+        .then((res) => {
+          message.success("Đăng kí thành công");
+          setTimeout(() => {
+            history.push("/login");
+          }, 3000);
+        })
+        .catch((err) => {
+          message.error(err.message);
+          console.log("err", err);
+        });
     },
   });
 

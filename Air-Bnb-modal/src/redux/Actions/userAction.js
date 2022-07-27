@@ -9,7 +9,7 @@ import { message } from "antd";
 import { history } from "../../App";
 import httpServ from "../../serviceWorker/http.service";
 import localStorageServ from "../../serviceWorker/locaStorage.service";
-import { SET_EDIT_TAM, SET_USER_INFOR } from "../Constants/userConstant";
+import { SET_USER_INFOR } from "../Constants/userConstant";
 
 export const loginUserAction = (data) => {
   return (dispatch) => {
@@ -94,10 +94,6 @@ export const getUserInforAction = (id) => {
           type: SET_USER_DETAILS_INFOR,
           payload: res.data,
         });
-        dispatch({
-          type: SET_EDIT_TAM,
-          payload: res.data,
-        });
       })
       .catch((err) => {
         console.log("err", err);
@@ -127,6 +123,9 @@ export const updateUserInforAction = (value, id) => {
       .updateUserInfor(value, id)
       .then((res) => {
         message.success("Cập nhật thành công");
+        setTimeout(() => {
+          history.push("/admin/user");
+        }, 1000);
       })
       .catch((err) => {
         console.log("err", err);

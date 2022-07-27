@@ -4,49 +4,35 @@ import AxiosServ from "./axios.service";
 class HttpRequestService {
   constructor() {}
 
-  // user Log
-
-  dangNhap = (data) => {
-    const url = "/api/auth/login";
-
-    return AxiosServ.postMethod(url, data);
-  };
-
-  dangKi = (data) => {
-    const url = "/api/auth/register";
-
-    return AxiosServ.postMethod(url, data);
-  };
-
-  // user phong
-
   layDanhSachPhong = () => {
     const url = "/api/rooms";
 
     return AxiosServ.getMethod(url);
   };
-
   layThongTinPhong = (id) => {
     const url = `/api/rooms/${id}`;
 
     return AxiosServ.getMethod(url);
   };
-
-  datPhong=(data)=>{
-    const url=`/api/rooms/booking`;
-    return AxiosServ.postMethod(url,data);
-  }
-
   layDanhGiaPhong = (id) => {
     const url = `/api/reviews/byRoom?roomId=${id}`;
 
     return AxiosServ.getMethod(url);
   };
-
   layVeDaDangKi = (id) => {
     const url = `/api/tickets/by-user?userId=${id}`;
 
     return AxiosServ.getMethod(url);
+  };
+  dangNhap = (data) => {
+    const url = "/api/auth/login";
+
+    return AxiosServ.postMethod(url, data);
+  };
+  dangKi = (data) => {
+    const url = "/api/auth/register";
+
+    return AxiosServ.postMethod(url, data);
   };
 
   //user services
@@ -95,7 +81,7 @@ class HttpRequestService {
   };
 
   // location services
-  
+
   getLocationList = (location = "") => {
     if (location.trim() !== "") {
       const uri = `/api/locations?location=${location}`;

@@ -14,6 +14,7 @@ export default function SearchLo() {
   const { roomList } = useSelector((state) => state.roomReducer);
 
   let { locationId } = useParams();
+  console.log("id", locationId);
 
   useEffect(() => {
     dispatch(getRoomListAction(locationId));

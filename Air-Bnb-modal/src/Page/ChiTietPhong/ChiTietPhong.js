@@ -1,3 +1,4 @@
+
 import axios from 'axios';
 import React from 'react'
 import { useEffect } from 'react';
@@ -8,31 +9,24 @@ import { DOMAIN, TOKEN_CYBERSOFT } from '../../configUrl/configURL';
 import FooterNav from '../Footer/Footer';
 import 'react-date-range/dist/styles.css'; // main style file
 import 'react-date-range/dist/theme/default.css'; // theme css file
-import { DateRange, DateRangePicker } from 'react-date-range';
-import { Button, Modal, message } from 'antd';
+import { DateRangePicker } from 'react-date-range';
+import { Button, Modal } from 'antd';
 import { addDays } from 'date-fns';
 import "./chiTietPhong.css";
 import DanhGiaPhong from './DanhGiaPhong';
 import { store } from '../..';
 import { set_spinner_end, set_spinner_start } from '../../redux/Actions/spinnerActions';
 import httpServ from '../../serviceWorker/http.service';
-import { useFormik } from 'formik';
-import { format } from "date-fns";
-import { useSelector } from 'react-redux';
-import moment from 'moment';
 
 
 
 export default function ChiTietPhong() {
-  const { userInfor } = useSelector((state) => state.userReducer);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isModalCalendar, setIsModalCalendar] = useState(false);
   const [noOfGuests, setNoOfGuests] = useState(0);
   const [noOfGuestsNho, setNoOfGuestsNho] = useState(0);
   const [noOfGuestsLon, setNoOfGuestsLon] = useState(0);
   const [noOfGuestsVua, setNoOfGuestsVua] = useState(0);
-  const [noSoNgay, setNoSoNgay] = useState(0);
-  const [noLink, setNoLink] = useState("");
 
   const [isModalImageVisible, setIsModalImageVisible] = useState(false);
 
@@ -77,24 +71,22 @@ export default function ChiTietPhong() {
   const [dataRoom, setDataRom] = useState({});
   const [moneySet, setMoneySet] = useState({});
 
-  const [startDate, setStartDate] = useState(new Date());
-  const [endDate, setEndDate] = useState(new Date());
-  const startDateCheck = moment(startDate);
-  const timeEndCheck = moment(endDate);
-  const diff = timeEndCheck.diff(startDate);
-  const diffDuration =moment.duration(diff);
+  const [startDate, setstartDate] = useState(new Date());
+  const [endDate, setendDate] = useState(new Date());
 
   const handleSelect = (ranges) => {
-    setStartDate(ranges.selection.startDate);
-    setEndDate(ranges.selection.endDate);
-   // setNoSoNgay(endDate.toISOString() - startDate.toISOString());
+    setstartDate(ranges.selection.startDate);
+    setendDate(ranges.selection.endDate);
+    setMoneySet(startDate - endDate);
   }
 
-
-  const formatminDate = format(new Date(), "dd MMMM yy");
-  const formatStartDate = format(new Date(startDate), "dd MMMM yy");
-  const formatEndDate = format(new Date(endDate), "dd MMMM yy");
-
+  const [state, setState] = useState([
+    {
+      startDate: new Date(),
+      endDate: addDays(new Date(), 7),
+      key: 'selection'
+    }
+  ]);
 
   const selectionRange = {
     startDate: startDate,
@@ -105,7 +97,7 @@ export default function ChiTietPhong() {
   const tangGuestsNho = () => {
     if (noOfGuests < dataRoom.guests) {
       setNoOfGuestsNho(noOfGuestsNho + 1);
-      setNoOfGuests(noOfGuests + 1);
+      setNoOfGuests(noOfGuestsNho + 1);
     }
   }
 
@@ -123,7 +115,7 @@ export default function ChiTietPhong() {
   const tangGuestsLon = () => {
     if (noOfGuests < dataRoom.guests) {
       setNoOfGuestsLon(noOfGuestsLon + 1);
-      setNoOfGuests(noOfGuests + 1);
+      setNoOfGuests(noOfGuestsLon + 1);
     }
   }
 
@@ -140,7 +132,7 @@ export default function ChiTietPhong() {
   const tangGuestsVua = () => {
     if (noOfGuests < dataRoom.guests) {
       setNoOfGuestsVua(noOfGuestsVua + 1);
-      setNoOfGuests(noOfGuests + 1);
+      setNoOfGuests(noOfGuestsVua + 1);
     }
   }
 
@@ -164,34 +156,16 @@ export default function ChiTietPhong() {
     //   },
     // })
     httpServ
-      .layThongTinPhong(id)
+    .layThongTinPhong(id)
       .then((res) => {
+        console.log("res", res);
         setDataRomLo(res.data.locationId);
         setDataRom(res.data);
-        setNoLink(res.data._id)
       })
       .catch((err) => {
+        console.log(err);
       });
   }, []);
-
-  const formik = useFormik({
-    initialValues: {
-      roomId: `${id}`,
-      checkIn: `${startDate.toISOString()}`,
-      checkOut: `${endDate.toISOString()}`,
-    },
-    onSubmit: values => {
-      httpServ
-        .datPhong(values)
-        .then((res) => {
-          message.success("Đặt phòng thanh công");
-        })
-        .catch((err) => {
-          message.error("Đặt phòng thật bại");
-        });
-      console.log("init", values);
-    },
-  });
 
   return (
     <div>
@@ -229,10 +203,10 @@ export default function ChiTietPhong() {
             <div className="detail_abso">
               <>
                 <Button className="bg-white rounded-lg focus:outline-none hover:outline-none" onClick={showImageModal}>
-                  Show all photos
+                 Show all photos
                 </Button>
                 <Modal title="Basic Modal" visible={isModalImageVisible} onOk={handleImageOk} onCancel={handleImageCancel}>
-                  <img src={dataRoom.image} layout="fill" className="object-cover w-full" />
+                <img src={dataRoom.image} layout="fill" className="object-cover w-full" />
                 </Modal>
               </>
             </div>
@@ -395,14 +369,11 @@ export default function ChiTietPhong() {
                 <div className="pt-5 calendar_item">
                   <h1 className="text-3xl">Select check-in date</h1>
                   <p>Add your travel dates for exact pricing</p>
-                  <DateRange
-                    className="calendar_item"
-                    onChange={handleSelect}
-                    months={2}
-                    minDate={new Date()}
+                  <DateRangePicker
                     ranges={[selectionRange]}
+                    minDate={new Date()}
                     rangeColors={["#FD5B61"]}
-                    direction="horizontal"
+                    onChange={handleSelect}
                   />
                 </div>
               </div>
@@ -418,21 +389,16 @@ export default function ChiTietPhong() {
                               <Button onClick={showModalCal} className="border-none w-full text-left">
                                 <div>
                                   <h1 className="pt-2" style={{ fontSize: "12px" }}>CHECK-IN</h1>
-                                  {formatEndDate === formatminDate ? (
-                                    <p className="text-gray-400" style={{ fontSize: "14px" }}>Add date</p>
-                                  ) : (
-                                    <p className="text-gray-400" style={{ fontSize: "14px" }}>{formatStartDate}</p>
-                                  )}
+                                  <p className="text-gray-400" style={{ fontSize: "14px" }}>Add date</p>
                                 </div>
                               </Button>
-                              <Modal visible={isModalCalendar} onOk={handleOkCal} onCancel={handleCancelCal} width={"900px"} height={"1000px"} okText={false}>
-                                <DateRange
-                                  className="calendar_item"
-                                  onChange={handleSelect}
+                              <Modal visible={isModalCalendar} onOk={handleOkCal} onCancel={handleCancelCal} width={"1000px"} height={"1000px"}>
+                                <DateRangePicker
+                                  onChange={item => setState([item.selection])}
+                                  showSelectionPreview={true}
+                                  moveRangeOnFirstSelection={false}
                                   months={2}
-                                  minDate={new Date()}
-                                  ranges={[selectionRange]}
-                                  rangeColors={["#FD5B61"]}
+                                  ranges={state}
                                   direction="horizontal"
                                 />
                               </Modal>
@@ -443,21 +409,16 @@ export default function ChiTietPhong() {
                               <Button onClick={showModalCal} className="border-none w-full text-left">
                                 <div>
                                   <h1 className="pt-2" style={{ fontSize: "12px" }}>CHECK-OUT</h1>
-                                  {formatEndDate === formatminDate ? (
-                                    <p className="text-gray-400" style={{ fontSize: "14px" }}>Add date</p>
-                                  ) : (
-                                    <p className="text-gray-400" style={{ fontSize: "14px" }}>{formatEndDate}</p>
-                                  )}
+                                  <p className="text-gray-400" style={{ fontSize: "14px" }}>Add date</p>
                                 </div>
                               </Button>
-                              <Modal visible={isModalCalendar} onOk={handleOkCal} onCancel={handleCancelCal} width={"900px"} height={"1000px"} okText={false}>
-                                <DateRange
-                                  className="calendar_item"
-                                  onChange={handleSelect}
+                              <Modal visible={isModalCalendar} onOk={handleOkCal} onCancel={handleCancelCal} width={"1000px"} height={"1000px"}>
+                                <DateRangePicker
+                                  onChange={item => setState([item.selection])}
+                                  showSelectionPreview={true}
+                                  moveRangeOnFirstSelection={false}
                                   months={2}
-                                  minDate={new Date()}
-                                  ranges={[selectionRange]}
-                                  rangeColors={["#FD5B61"]}
+                                  ranges={state}
                                   direction="horizontal"
                                 />
                               </Modal>
@@ -525,25 +486,10 @@ export default function ChiTietPhong() {
                           </div>
                         </div>
                       </div>
-                      {userInfor === null ? (
-                        <></>
-                      ) : (
-                        <form onSubmit={(event) => {
-                          event.preventDefault();
-                          formik.handleSubmit(event);
-                        }} className="mt-5">
-                          <button className="focus:outline-none w-full rounded-xl transform active:scale-90" style={{ background: " linear-gradient(to right, #E61E4D 0%, #E31C5F 50%, #D70466 100%)" }} type="submit">
-                            <p className="text-white font-bold text-xl mt-3">Check availability</p>
-                          </button>
-                        </form>
-                      )}
-                      <div className="flex justify-between my-6 pb-4 border-b">
-                      <p className="text-gray-400 underline text-lg">${dataRoom.price} x {diffDuration.days()} night</p>
-                      <p className="text-gray-400 underline text-lg">${dataRoom.price * diffDuration.days()}</p>
-                      </div>
-                      <div className="flex justify-between">
-                      <p className="text-gray-400 underline text-lg">Total before taxes</p>
-                      <p className="text-gray-400 underline text-lg">${dataRoom.price * diffDuration.days()}</p>
+                      <div className="mt-5">
+                        <button className="focus:outline-none w-full rounded-xl transform active:scale-90" style={{ background: " linear-gradient(to right, #E61E4D 0%, #E31C5F 50%, #D70466 100%)" }}>
+                          <p className="text-white font-bold text-xl mt-3">Check availability</p>
+                        </button>
                       </div>
                     </div>
                   </div>
