@@ -1,15 +1,16 @@
 import React from "react";
 import { Button, Input, Form, Select, DatePicker } from "antd";
 import * as Yup from "yup";
-import { updateUserInforAction } from "../../../../redux/Actions/userAction";
+
 import { useDispatch, useSelector } from "react-redux";
 import { useFormik } from "formik";
 import moment from "moment";
 import { history } from "../../../../App";
+import { updateUserInforAction } from "../../../../redux/Actions/userAction";
 
 export default function AdminEditUser() {
   const dispatch = useDispatch();
-  const { userInforDetails,userInfor } = useSelector((state) => state.userReducer);
+  const {  userInforEditUser } = useSelector((state) => state.userReducer);
 
   //Form
   const { Option } = Select;
@@ -27,26 +28,21 @@ export default function AdminEditUser() {
   const formik = useFormik({
     enableReinitialize: true,
     initialValues: {
-      id: userInforDetails._id,
-      name: userInforDetails.name,
-      address: userInforDetails.address,
-      email: userInforDetails.email,
-      phone: userInforDetails.phone,
-      gender: userInforDetails.gender,
-      password: userInforDetails.password,
-      birthday: userInforDetails.birthday,
-      type: userInforDetails.type,
+      id:  userInforEditUser._id,
+      name:  userInforEditUser.name,
+      address:  userInforEditUser.address,
+      email:  userInforEditUser.email,
+      phone:  userInforEditUser.phone,
+      gender:  userInforEditUser.gender,
+      password:  userInforEditUser.password,
+      birthday:  userInforEditUser.birthday,
+      type: userInforEditUser.type,
     },
     onSubmit: (values) => {
-      dispatch(updateUserInforAction(values, values.id));
-      setTimeout(() => {
-        if(userInfor.type==="ADMIN"){
-        history.push("/admin/user");
-        }
-        else {
-          history.push(`/profile/${values.id}`);
-        }
-      }, 1000);
+     // dispatch(updateUserInforAction(values, values.id));
+      // setTimeout(() => {
+      //   history.push(`/profile/${values.id}`);
+      // }, 1000);
     },
     validationSchema: Yup.object({
       name: Yup.string()
